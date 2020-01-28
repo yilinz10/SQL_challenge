@@ -20,11 +20,11 @@ FROM all_loans AS t1
 LEFT JOIN all_loanhist AS t2
 ON t1.loanid = t2.loanid
 WHERE extract(day FROM (age(t2.eowdate::date, (SELECT MIN(t3.approvedate)
-										                           FROM all_loans AS t3
+				  	       FROM all_loans AS t3
                                                WHERE t3.custid = t1.custid)::date
                             )
                         )
-			        ) < 180
+	      ) < 180
 GROUP BY t1.custid;
 
 Q4.
@@ -41,17 +41,22 @@ FROM all_loans AS t1
 LEFT JOIN all_loanhist AS t2
 ON t1.loanid = t2.loanid
 WHERE EXTRACT(day FROM (age(t2.eowdate::date, (SELECT MIN(t3.approvedate)
-										  FROM all_loans AS t3
-                                          WHERE t3.custid = t1.custid)::date
-						                )
-						            )
-			        ) < 180
+				               FROM all_loans AS t3
+                                               WHERE t3.custid = t1.custid)::date
+			    )
+	                )
+	      ) < 180
 OR EXTRACT(day FROM (age(t1.approvedate::date, (SELECT MIN(t3.approvedate)
-										  FROM all_loans AS t3
-                                          WHERE t3.custid = t1.custid)::date
-						             )
-						        )
-			        ) < 180
+					        FROM all_loans AS t3
+                                                WHERE t3.custid = t1.custid)::date
+		         )
+		     )
+	   ) < 180
 GROUP BY custid, loanid
 ) AS T
 GROUP BY T.custid;
+
+
+## I'm not one hundred percent sure about methods dealing with timestamp in PostgreSQL. I think the method here 
+## corresponding to the "DATEDIFF" method in MySQL.
+
